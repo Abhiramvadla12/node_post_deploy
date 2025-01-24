@@ -1,9 +1,12 @@
 import express from "express";
 import cors from "cors";
-import { json, urlencoded } from "body-parser";
+// Importing body-parser correctly with the default export
+import bodyParser from "body-parser";
 import { createTransport } from "nodemailer";
 import { config } from "dotenv";
 
+// Destructure json and urlencoded from the default import
+const { json, urlencoded } = bodyParser;
 // Load environment variables from .env file (for local development or Render)
 config();
 
