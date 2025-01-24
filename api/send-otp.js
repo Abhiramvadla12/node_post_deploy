@@ -9,14 +9,14 @@ config();
 
 const app = express();
 
-// CORS configuration
+// CORS configuration: Allow requests from your frontend's domain
 const corsOptions = {
-  origin: "http://localhost:5173",  // Allow requests from your local frontend
+  origin: "http://localhost:5173",  // Allow localhost for development
   methods: ["GET", "POST"],         // Allow GET and POST methods
-  allowedHeaders: ["Content-Type"], // Allow Content-Type header
+  allowedHeaders: ["Content-Type"], // Allow the Content-Type header
 };
 
-// Apply CORS middleware with the specified options
+// Apply CORS middleware
 app.use(cors(corsOptions));
 
 app.use(json());
