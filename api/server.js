@@ -4,25 +4,18 @@ import { json, urlencoded } from "body-parser";
 import { createTransport } from "nodemailer";
 import { config } from "dotenv";
 
-// Load environment variables from Vercel environment
+// Load environment variables from .env file (for local development or Render)
 config();
 
 const app = express();
 
-// CORS configuration: Allow requests from your frontend's domain
-const corsOptions = {
-  origin: "http://localhost:5173",  // Allow localhost for development
-  methods: ["GET", "POST"],         // Allow GET and POST methods
-  allowedHeaders: ["Content-Type"], // Allow the Content-Type header
-};
-
-// Apply CORS middleware
-app.use(cors(corsOptions));
-
+// Middleware
+app.use(cors()); // Enable all CORS requests
 app.use(json());
 app.use(urlencoded({ extended: true }));
 
-app.post("/send-otp", async (req, res) => {
+// Send OTP endpoint
+app.post("/api/send-otp", async (req, res) => {
   const { email, otp } = req.body;
 
   if (!email || !otp) {
@@ -30,11 +23,12 @@ app.post("/send-otp", async (req, res) => {
   }
 
   try {
+    // Configure Nodemailer with environment variables
     const transporter = createTransport({
       service: "gmail",
       auth: {
-        user: process.env.EMAIL_USER, // Your Gmail address
-        pass: process.env.EMAIL_PASS, // Your Gmail password or app-specific password
+        user: process.env.EMAIL_USER, // Use environment variable for email user
+        pass: process.env.EMAIL_PASS, // Use environment variable for email password
       },
     });
 
@@ -45,8 +39,8 @@ app.post("/send-otp", async (req, res) => {
       text: `Your OTP code is ${otp}. Please use this code to verify your account.`,
     };
 
+    // Send the email
     await transporter.sendMail(mailOptions);
-
     res.status(200).json({ message: "OTP sent successfully" });
   } catch (error) {
     console.error("Error sending email:", error);
@@ -54,5 +48,11 @@ app.post("/send-otp", async (req, res) => {
   }
 });
 
-// Export the app (required for Vercel deployment)
+// Render environment: listen on the port defined by Render or 3000 locally
+const port = process.env.PORT || 3000; 
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
+});
+
+// Export the app (required for Render deployment)
 export default app;
